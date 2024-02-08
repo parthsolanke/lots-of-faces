@@ -1,11 +1,6 @@
 import cv2 as cv
 import os
 
-vid = cv.VideoCapture(0)
-vid.set(3, 640)
-vid.set(4, 480)
-
-
 detector = cv.CascadeClassifier("./haar_face.xml")
 
 if not os.listdir("./models"):
@@ -18,6 +13,10 @@ else:
     with open("./models/labels.txt", "r") as f:
         labels = f.read().split("\n")
 
+vid = cv.VideoCapture(0)
+vid.set(3, 640)
+vid.set(4, 480)
+
 while True:
     ret, frame = vid.read()
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -28,7 +27,7 @@ while True:
         face = gray[y:y+h, x:x+w]
         
         id, confidence = recognizer.predict(face)
-        if confidence > 75:
+        if confidence > 65:
             cv.putText(frame, f"{labels[id]}",
                        (x,y), cv.FONT_HERSHEY_SIMPLEX, 1, (144, 238, 144), 2)
             cv.rectangle(frame, (x,y), (x+w, y+h), (144, 238, 144), 2)

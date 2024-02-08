@@ -64,31 +64,7 @@ def image_feed():
         image = infer(image)
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         
-        # emotion prediction
-        reshaped_img = cv.resize(image, (48, 48), interpolation=cv.INTER_AREA)
-        normalized_img = reshaped_img.astype("float32") / 255.0
-        reshaped_img = np.reshape(normalized_img, (1, 48, 48, 3))
         
-        preds = emotion_model.predict(reshaped_img)
-        file_name = uploaded_file.name
-        
-        # fetchQuote(emotion_dict[file_name])
-    # 
-        
-        st.image(image)
-        
-        reqUrl = "http://192.168.169.229:3001/api/v1/quote?emotion="+emotion_dict[file_name]
-
-        payload = ""
-
-        response = requests.request("GET", reqUrl, data=payload)
-        json_response = response.json()
-    # # st.json(json_response)
-        quote = json_response["quote"]["quote"]
-        author = json_response["quote"]["author"]
-
-        st.markdown(f"> {quote}\n> \n> {author}")
-        # st.write(f"Uploaded file name: {file_name}")
 
 def video_feed():
     st.title("Video Feed")

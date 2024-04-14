@@ -11,7 +11,7 @@ ROW_SIZE = 10  # pixels
 FONT_SIZE = 1
 FONT_THICKNESS = 1
 TEXT_COLOR = (0, 255, 0)  # green
-ANNOTATION_COLOR = (0, 0, 255)  # red
+ANNOTATION_COLOR = (255, 255, 255)  # white
 
 class FaceDetector:
     """A class for detecting faces in an image using a pre-trained model.

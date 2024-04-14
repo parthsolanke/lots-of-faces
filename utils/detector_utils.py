@@ -139,7 +139,7 @@ if __name__ == "__main__":
     face_detector = FaceDetector(model_asset_path='./utils/weights/detector.tflite')
 
     # Load the input image
-    image = mp.Image.create_from_file("./utils/test/parth (2).jpg")
+    image = mp.Image.create_from_file("./utils/data/parth (2).jpg")
 
     # Detect faces in the input image
     detection_result = face_detector.detector.detect(image)

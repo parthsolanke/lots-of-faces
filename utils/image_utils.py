@@ -77,3 +77,23 @@ class ImageManager:
                 image_path = os.path.join(self.save_dir, file_name)
                 image_list.append(image_path)
         return image_list
+
+
+if __name__ == "__main__":
+    # Test the ImageManager class
+    save_directory = "/path/to/save/directory"
+    image_manager = ImageManager(save_directory)
+    
+    # Create the save directory
+    image_manager.create_directory()
+    
+    # Capture and save an image
+    frame = cv2.imread("path/to/image.jpg")
+    image_manager.capture_image(frame)
+    
+    # Get the list of images in the save directory
+    images = image_manager.get_images()
+    print("Images in the save directory:", images)
+    
+    # Clear the save directory
+    image_manager.clear_directory()

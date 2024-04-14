@@ -3,31 +3,24 @@ import asyncio
 import numpy as np
 import mediapipe as mp
 
-import utils.detector_utils as dtu
-import utils.image_utils as imu
+from utils.train_utils import Trainer
+from utils.image_utils import ImageManager
+from utils.detector_utils import FaceDetector
+from utils.recognizer_utils import FaceRecognizer
 
 VIDEO_PATH = 0  # Webcam
 SAVE_DIR = "./dynamic/data"
 WEIGHTS_PATH = "./utils/weights/detector.tflite"
 
-async def run_inference():
+async def detector_inference():
     """
-    Runs the face detection inference on a video stream.
-
-    This function initializes a face detector, captures frames from a video stream,
-    performs face detection on each frame, and displays the annotated image with
-    detected faces. It also provides the option to capture multiple images by pressing
-    the 'c' key.
-
-    Returns:
-        None
     """
-    face_detector = dtu.FaceDetector(model_asset_path=WEIGHTS_PATH)
+    face_detector = FaceDetector(model_asset_path=WEIGHTS_PATH)
 
     cap = cv2.VideoCapture(VIDEO_PATH)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 
-    image_manager = imu.ImageManager(save_dir=SAVE_DIR)
+    image_manager = ImageManager(save_dir=SAVE_DIR)
     image_manager.create_directory()
 
     while cap.isOpened():
@@ -63,9 +56,10 @@ async def run_inference():
     cap.release()
 
 async def main():
-    await asyncio.create_task(run_inference())
+    await asyncio.create_task(detector_inference())
 
-try:
-    asyncio.run(main())
-finally:
-    cv2.destroyAllWindows()
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    finally:
+        cv2.destroyAllWindows()

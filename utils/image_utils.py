@@ -2,7 +2,6 @@ import os
 import cv2
 import numpy as np
 import asyncio
-from tqdm import tqdm
 
 class ImageManager:
     """
@@ -19,7 +18,7 @@ class ImageManager:
         create_directory: Creates the save directory if it doesn't exist and clears any existing files.
         capture_image: Captures and saves an image.
         capture_num_images: Captures and saves num images at a given interval.
-        capture_multiple_images: Captures and saves multiple images with a progress info.
+        capture_multiple_images: Captures and saves multiple images with progress info.
         clear_directory: Clears all files in the save directory.
         get_file_list: Returns a list of file names in the save directory.
         get_images: Returns a list of images in the save directory.
@@ -100,7 +99,7 @@ class ImageManager:
     
     async def capture_multiple_images(self, frame):
         """
-        Captures and saves multiple images with a progress bar.
+        Captures and saves multiple images with progress info.
 
         Args:
             frame: The image frame to be saved.

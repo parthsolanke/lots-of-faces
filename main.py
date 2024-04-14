@@ -11,7 +11,17 @@ SAVE_DIR = "./dynamic/data"
 WEIGHTS_PATH = "./utils/weights/detector.tflite"
 
 async def run_inference():
+    """
+    Runs the face detection inference on a video stream.
 
+    This function initializes a face detector, captures frames from a video stream,
+    performs face detection on each frame, and displays the annotated image with
+    detected faces. It also provides the option to capture multiple images by pressing
+    the 'c' key.
+
+    Returns:
+        None
+    """
     face_detector = dtu.FaceDetector(model_asset_path=WEIGHTS_PATH)
 
     cap = cv2.VideoCapture(VIDEO_PATH)

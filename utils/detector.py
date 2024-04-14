@@ -13,7 +13,6 @@ FONT_THICKNESS = 1
 TEXT_COLOR = (0, 255, 0)  # green
 ANNOTATION_COLOR = (0, 0, 255)  # red
 
-
 class FaceDetector:
     """A class for detecting faces in an image using a pre-trained model.
 

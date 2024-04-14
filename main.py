@@ -1,6 +1,8 @@
 import cv2
+import asyncio
 import numpy as np
 import mediapipe as mp
+
 import utils.detector_utils as dtu
 import utils.image_utils as imu
 
@@ -8,26 +10,29 @@ VIDEO_PATH = 0  # Webcam
 SAVE_DIR = "./dynamic/data"
 WEIGHTS_PATH = "./utils/weights/detector.tflite"
 
-face_detector = dtu.FaceDetector(model_asset_path=WEIGHTS_PATH)
-image_manager = imu.ImageManager(save_dir=SAVE_DIR)
+async def run_inference():
 
-cap = cv2.VideoCapture(VIDEO_PATH)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    face_detector = dtu.FaceDetector(model_asset_path=WEIGHTS_PATH)
 
-image_manager.clear_directory()
-image_manager.create_directory()
+    cap = cv2.VideoCapture(VIDEO_PATH)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 
-try:
+    image_manager = imu.ImageManager(save_dir=SAVE_DIR)
+    image_manager.create_directory()
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
 
-        image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-        detection_result = face_detector.detector.detect(image)
-        image_copy = np.copy(frame)
+        detection_result = face_detector.detector.detect(
+            mp.Image(
+                image_format=mp.ImageFormat.SRGB,
+                data=frame
+            )
+        )
         annotated_image = face_detector.visualize(
-            image_copy,
+            np.copy(frame),
             detection_result,
             show_keypoints=False,
             show_label_score=False
@@ -35,12 +40,22 @@ try:
 
         cv2.imshow("Face Detection", annotated_image)
 
-        # Check for key press events
         key = cv2.waitKey(1)
         if key == ord('q'):
             break
         elif key == ord('c'):
-            image_manager.capture_image(frame)
-finally:
+            cv2.destroyWindow("Face Detection")
+            await asyncio.create_task(image_manager.capture_multiple_images(frame))
+
+        await asyncio.sleep(0)
+
+    image_manager.clear_directory()
     cap.release()
+
+async def main():
+    await asyncio.create_task(run_inference())
+
+try:
+    asyncio.run(main())
+finally:
     cv2.destroyAllWindows()

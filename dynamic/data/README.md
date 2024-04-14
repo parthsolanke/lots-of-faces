@@ -1,0 +1,1 @@
+## This directory is where the data files are stored when the images are taken for the dynamic detction.

@@ -3,53 +3,41 @@ import numpy as np
 import mediapipe as mp
 import utils.detector as dtr
 
-MARGIN = 10  # pixels
-ROW_SIZE = 10  # pixels
-FONT_SIZE = 1
-FONT_THICKNESS = 1
-TEXT_COLOR = (0, 255, 0)  # green
-ANNOTATION_COLOR = (255, 0, 0)  # red
-
-
 # Create an instance of the FaceDetector class
 face_detector = dtr.FaceDetector(model_asset_path='./utils/weights/detector.tflite')
 
-# Load the input image
-image = mp.Image.create_from_file("./utils/test/parth (2).jpg")
+# Open the video file
+video_path = 0 # Set to 0 to use the webcam
+cap = cv2.VideoCapture(video_path)
 
-# Detect faces in the input image
-detection_result = face_detector.detector.detect(image)
+while cap.isOpened():
+    # Read a frame from the video
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-# Process the detection result and visualize it
-image_copy = np.copy(image.numpy_view())
-annotated_image = face_detector.visualize(image_copy, detection_result)
+    # Create an instance of the mediapipe Image class
+    image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
 
-# Show the bounding box coordinates and keypoints coordinates
-for i, (start_point, end_point) in enumerate(face_detector.bounding_boxes):
-    cv2.putText(
-        annotated_image,
-        f"Box {i+1}: {start_point}, {end_point}",
-        (MARGIN, 30 + i * ROW_SIZE),
-        cv2.FONT_HERSHEY_PLAIN,
-        FONT_SIZE,
-        TEXT_COLOR,
-        FONT_THICKNESS,
+    # Detect faces in the frame
+    detection_result = face_detector.detector.detect(image)
+
+    # Process the detection result and visualize it
+    image_copy = np.copy(frame)
+    annotated_image = face_detector.visualize(
+        image_copy,
+        detection_result,
+        show_keypoints=False,
+        show_label_score=False
     )
 
-for i, keypoints in enumerate(face_detector.keypoints):
-    for j, keypoint in enumerate(keypoints):
-        cv2.putText(
-            annotated_image,
-            f"Keypoint {j+1}: {keypoint}",
-            (MARGIN, 30 + (i + 1) * ROW_SIZE + j * ROW_SIZE),
-            cv2.FONT_HERSHEY_PLAIN,
-            FONT_SIZE,
-            TEXT_COLOR,
-            FONT_THICKNESS,
-        )
+    # Display the annotated frame
+    cv2.imshow("Face Detection", annotated_image)
 
-rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
-cv2.imshow("Face Detection", rgb_annotated_image)
+    # Check for key press to exit
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-cv2.waitKey(0)
+# Release the video capture and close all windows
+cap.release()
 cv2.destroyAllWindows()

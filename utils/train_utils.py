@@ -1,10 +1,10 @@
 import cv2
 import os
 import shutil
+import asyncio
 import numpy as np
 import tkinter as tk
 import mediapipe as mp
-from tkinter import filedialog
 from utils.detector_utils import FaceDetector
 
 class Trainer:
@@ -39,7 +39,7 @@ class Trainer:
             face = img[start_point[1]:end_point[1], start_point[0]:end_point[0]]
             return face
 
-    def train(self, save_dir, images_list):
+    async def train(self, save_dir, images_list):
         """
         Train the model on the extracted faces.
         
@@ -47,6 +47,9 @@ class Trainer:
             save_dir (str): The directory path to save the trained model and labels.
             images_list (list): A list of image file paths to train the model on.
         """
+        
+        self.write_name_to_file(save_dir)
+    
         faces = []
         labels = []
         index = []
@@ -60,10 +63,11 @@ class Trainer:
                     labels.append(label)
                     index.append(i)
         index = np.array(index)
-        recognizer = cv2.face.LBPHFaceRecognizer_create()
+        recognizer = cv2.face.LBPHFaceRecognizer()
         recognizer.train(faces, index)
         
         self.save_model_and_labels(recognizer, labels)
+        await asyncio.sleep(0)
 
     def save_model_and_labels(self, recognizer, labels):
         """
@@ -118,8 +122,18 @@ class Trainer:
         """
         self.create_directory(dir)
         root = tk.Tk()
-        root.withdraw()
-        name = filedialog.askstring("Enter Name", "Enter your name:")
+        root.title("Enter your name:")
+        
+        var = tk.StringVar()
+        entry = tk.Entry(root, textvariable=var)
+        entry.pack()
+        
+        button = tk.Button(root, text="Enter", command=root.quit)
+        button.pack()
+        
+        root.mainloop()
+        name = var.get()
+        root.destroy()
 
         with open(dir + file_name, 'w') as file:
             file.write(name)

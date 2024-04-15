@@ -104,8 +104,8 @@ class ImageManager:
         Args:
             frame: The image frame to be saved.
         """
-        num_images = 100
-        interval = 500
+        num_images = 50
+        interval = 250
         for i in range(num_images):
             self.capture_image(frame)
             

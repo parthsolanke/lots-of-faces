@@ -51,7 +51,7 @@ async def detector_inference():
         elif key == ord('c'):
             cv2.destroyWindow("Face Detection")
             await asyncio.create_task(image_manager.capture_multiple_images(frame))
-            # await asyncio.create_task(trainer.train(SAVE_DIR_WEIGHTS, image_manager.get_images()))
+            await asyncio.create_task(trainer.train(SAVE_DIR_WEIGHTS, image_manager.get_images()))
             
 
         await asyncio.sleep(0)

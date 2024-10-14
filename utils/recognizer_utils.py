@@ -1,9 +1,14 @@
+# utils/recognizer_utils.py
+
 import cv2
 
 class FaceRecognizer:
     def __init__(self, model_path):
-        self.model = cv2.face.LBPHFaceRecognizer_create()
-        self.model.read(model_path)
+        try:
+            self.model = cv2.face.LBPHFaceRecognizer_create()
+            self.model.read(model_path)
+        except Exception as e:
+            raise ValueError(f"Error loading model from {model_path}: {str(e)}")
 
     def recognize_faces(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

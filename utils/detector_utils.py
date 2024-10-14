@@ -1,3 +1,5 @@
+# utils/detector_utils.py
+
 import math
 import cv2
 import numpy as np
@@ -14,24 +16,15 @@ TEXT_COLOR = (0, 255, 0)  # green
 ANNOTATION_COLOR = (255, 255, 255)  # white
 
 class FaceDetector:
-    """A class for detecting faces in an image using a pre-trained model.
-
-    Args:
-        model_asset_path (str): The path to the pre-trained model asset.
-
-    Attributes:
-        detector: The face detection model.
-        keypoints: The keypoints of the detected faces.
-        bounding_boxes: The bounding boxes of the detected faces.
-
-    """
-
     def __init__(self, model_asset_path: str):
-        base_options = python.BaseOptions(model_asset_path=model_asset_path)
-        options = vision.FaceDetectorOptions(base_options=base_options)
-        self.detector = vision.FaceDetector.create_from_options(options)
-        self.keypoints = []
-        self.bounding_boxes = []
+        try:
+            base_options = python.BaseOptions(model_asset_path=model_asset_path)
+            options = vision.FaceDetectorOptions(base_options=base_options)
+            self.detector = vision.FaceDetector.create_from_options(options)
+            self.keypoints = []
+            self.bounding_boxes = []
+        except Exception as e:
+            raise ValueError(f"Error loading face detection model: {str(e)}")
 
     def _normalized_to_pixel_coordinates(
         self, normalized_x: float, normalized_y: float, image_width: int, image_height: int
@@ -81,29 +74,22 @@ class FaceDetector:
         height, width, _ = image.shape
 
         for detection in detection_result.detections:
-            # Draw bounding_box
             bbox = detection.bounding_box
             start_point = bbox.origin_x, bbox.origin_y
             end_point = bbox.origin_x + bbox.width, bbox.origin_y + bbox.height
-            # cv2.rectangle(annotated_image, start_point, end_point, (255, 0, 0), 3)
             
-            # top left corner
             cv2.line(annotated_image, start_point, (start_point[0] + 20, start_point[1]), ANNOTATION_COLOR, 3)
             cv2.line(annotated_image, start_point, (start_point[0], start_point[1] + 20), ANNOTATION_COLOR, 3)
-            # top right corner
             cv2.line(annotated_image, (end_point[0], start_point[1]), (end_point[0] - 20, start_point[1]), ANNOTATION_COLOR, 3)
             cv2.line(annotated_image, (end_point[0], start_point[1]), (end_point[0], start_point[1] + 20), ANNOTATION_COLOR, 3)
-            # bottom left corner
             cv2.line(annotated_image, (start_point[0], end_point[1]), (start_point[0] + 20, end_point[1]), ANNOTATION_COLOR, 3)
             cv2.line(annotated_image, (start_point[0], end_point[1]), (start_point[0], end_point[1] - 20), ANNOTATION_COLOR, 3)
-            # bottom right corner
             cv2.line(annotated_image, end_point, (end_point[0] - 20, end_point[1]), ANNOTATION_COLOR, 3)
             cv2.line(annotated_image, end_point, (end_point[0], end_point[1] - 20), ANNOTATION_COLOR, 3)
     
             self.bounding_boxes.append((start_point, end_point))
 
             if show_keypoints:
-                # Draw keypoints
                 keypoints = []
                 for keypoint in detection.keypoints:
                     keypoint_px = self._normalized_to_pixel_coordinates(
@@ -115,7 +101,6 @@ class FaceDetector:
                 self.keypoints.append(keypoints)
 
             if show_label_score:
-                # Draw label and score
                 category = detection.categories[0]
                 category_name = category.category_name or ''
                 probability = round(category.score, 2)

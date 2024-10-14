@@ -8,22 +8,19 @@ from utils.image_utils import ImageManager
 from utils.detector_utils import FaceDetector
 from utils.recognizer_utils import FaceRecognizer
 
-VIDEO_PATH = 0  # Webcam
+VIDEO_PATH = 0
 SAVE_DIR = "./dynamic/data"
 SAVE_DIR_WEIGHTS = "./dynamic/weights"
 WEIGHTS_PATH = "./utils/weights/detector.tflite"
 
-async def detector_inference():
-    """
-    """
+async def detector_inference(trainer):
+    """Performs face detection and allows capturing images."""
     face_detector = FaceDetector(model_asset_path=WEIGHTS_PATH)
-    trainer = Trainer()
+    image_manager = ImageManager(save_dir=SAVE_DIR)
+    image_manager.create_directory()
 
     cap = cv2.VideoCapture(VIDEO_PATH)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-
-    image_manager = ImageManager(save_dir=SAVE_DIR)
-    image_manager.create_directory()
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -51,14 +48,17 @@ async def detector_inference():
         elif key == ord('c'):
             cv2.destroyWindow("Face Detection")
             await asyncio.create_task(image_manager.capture_multiple_images(frame))
-            await asyncio.create_task(trainer.train(SAVE_DIR_WEIGHTS, image_manager.get_images()))
+            image_list = image_manager.get_images()
             
-
-        await asyncio.sleep(0)
+            if not image_list:
+                print("No images were captured for training. Exiting...")
+                continue
+            await asyncio.create_task(trainer.train(SAVE_DIR_WEIGHTS, image_list))
 
     image_manager.clear_directory()
     cap.release()
-    
+    return True
+
 async def recognizer_inference():
     face_recognizer = FaceRecognizer(model_path="./dynamic/weights/trained_model.xml")
 
@@ -93,7 +93,8 @@ async def recognizer_inference():
     cap.release()
 
 async def main():
-    await asyncio.create_task(detector_inference())
+    trainer = Trainer()
+    await asyncio.create_task(detector_inference(trainer))
     await asyncio.create_task(recognizer_inference())
 
 if __name__ == "__main__":

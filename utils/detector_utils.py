@@ -8,12 +8,12 @@ from typing import Tuple, Union
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-MARGIN = 10  # pixels
-ROW_SIZE = 10  # pixels
+MARGIN = 10
+ROW_SIZE = 10
 FONT_SIZE = 1
 FONT_THICKNESS = 1
-TEXT_COLOR = (0, 255, 0)  # green
-ANNOTATION_COLOR = (255, 255, 255)  # white
+TEXT_COLOR = (0, 255, 0)
+ANNOTATION_COLOR = (255, 255, 255)
 
 class FaceDetector:
     def __init__(self, model_asset_path: str):
@@ -29,19 +29,6 @@ class FaceDetector:
     def _normalized_to_pixel_coordinates(
         self, normalized_x: float, normalized_y: float, image_width: int, image_height: int
     ) -> Union[None, Tuple[int, int]]:
-        """Converts normalized value pair to pixel coordinates.
-
-        Args:
-            normalized_x (float): The normalized x-coordinate value.
-            normalized_y (float): The normalized y-coordinate value.
-            image_width (int): The width of the image.
-            image_height (int): The height of the image.
-
-        Returns:
-            Union[None, Tuple[int, int]]: The pixel coordinates corresponding to the normalized values.
-                Returns None if the normalized values are invalid.
-
-        """
         def is_valid_normalized_value(value: float) -> bool:
             return (0 <= value <= 1) or math.isclose(value, 0) or math.isclose(value, 1)
 
@@ -58,18 +45,6 @@ class FaceDetector:
         show_label_score=True,
         show_keypoints=True,
     ) -> np.ndarray:
-        """Draws bounding boxes and keypoints on the input image and return it.
-
-        Args:
-            image (np.ndarray): The input RGB image.
-            detection_result: The list of all "Detection" entities to be visualized.
-            show_label_score (bool): Whether to show the label and score. Default is True.
-            show_keypoints (bool): Whether to show the keypoints. Default is True.
-
-        Returns:
-            np.ndarray: Image with bounding boxes.
-
-        """
         annotated_image = image.copy()
         height, width, _ = image.shape
 
@@ -120,20 +95,11 @@ class FaceDetector:
 
 
 if __name__ == "__main__":
-    # Create an instance of the FaceDetector class
     face_detector = FaceDetector(model_asset_path='./utils/weights/detector.tflite')
-
-    # Load the input image
     image = mp.Image.create_from_file("./utils/data/parth (2).jpg")
-
-    # Detect faces in the input image
     detection_result = face_detector.detector.detect(image)
-
-    # Process the detection result and visualize it
     image_copy = np.copy(image.numpy_view())
     annotated_image = face_detector.visualize(image_copy, detection_result)
-
-    # Show the bounding box coordinates and keypoints coordinates
     for i, (start_point, end_point) in enumerate(face_detector.bounding_boxes):
         cv2.putText(
             annotated_image,

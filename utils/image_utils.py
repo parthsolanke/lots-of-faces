@@ -12,11 +12,9 @@ class ImageManager:
         self.file_list = []
 
     def create_directory(self):
-        """Creates the directory for saving images if it doesn't exist."""
         create_directory(self.save_dir)
 
     def capture_image(self, frame):
-        """Captures and saves an image."""
         counter = 0
         while True:
             filename = os.path.join(self.save_dir, f"image_{counter}.jpg")
@@ -27,7 +25,6 @@ class ImageManager:
         print(f"Image captured and saved as: {filename}")
 
     def get_images(self):
-        """Returns a list of images in the save directory."""
         self.file_list = [f for f in os.listdir(self.save_dir) if f.endswith('.jpg')]
         image_list = []
 
@@ -39,7 +36,6 @@ class ImageManager:
         return image_list
 
     def clear_directory(self):
-        """Clears all files in the save directory."""
         for file_name in self.file_list:
             file_path = os.path.join(self.save_dir, file_name)
             try:
@@ -52,7 +48,6 @@ class ImageManager:
         print("Image directory cleared.")
 
     async def capture_multiple_images(self, frame):
-        """Captures and saves multiple images with progress info."""
         num_images = 50
         interval = 250
         for i in range(num_images):
